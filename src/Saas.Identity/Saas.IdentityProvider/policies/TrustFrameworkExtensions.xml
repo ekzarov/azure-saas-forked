@@ -1,225 +1,249 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<TrustFrameworkPolicy 
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" 
-  PolicySchemaVersion="0.3.0.0" 
-  TenantId="{Settings:Tenant}" 
-  PolicyId="B2C_1A_TrustFrameworkExtensions" 
-  PublicPolicyUri="http://{Settings:Tenant}/B2C_1A_TrustFrameworkExtensions">
-  
-  <BasePolicy>
-    <TenantId>{Settings:Tenant}</TenantId>
-    <PolicyId>B2C_1A_TrustFrameworkLocalization</PolicyId>
-  </BasePolicy>
-  <BuildingBlocks>
-    <ClaimsSchema>
-       <ClaimType Id="permissions">
-        <DisplayName>permissions</DisplayName>
-        <DataType>stringCollection</DataType>
-        <UserInputType>Readonly</UserInputType>
-      </ClaimType>
-       <ClaimType Id="roles">
-        <DisplayName>roles</DisplayName>
-        <DataType>stringCollection</DataType>
-        <UserInputType>Readonly</UserInputType>
-      </ClaimType>
-    </ClaimsSchema>
+<TrustFrameworkPolicy
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+  PolicySchemaVersion="0.3.0.0"
+  TenantId="asdktestwsft.onmicrosoft.com"
+  PolicyId="B2C_1A_TrustFrameworkExtensions"
+  PublicPolicyUri="http://asdktestwsft.onmicrosoft.com/B2C_1A_TrustFrameworkExtensions">
 
-  </BuildingBlocks>
+	<BasePolicy>
+		<TenantId>asdktestwsft.onmicrosoft.com</TenantId>
+		<PolicyId>B2C_1A_TrustFrameworkLocalization</PolicyId>
+	</BasePolicy>
 
-  <ClaimsProviders>
+	<BuildingBlocks>
+		<ClaimsSchema>
+			<ClaimType Id="permissions">
+				<DisplayName>permissions</DisplayName>
+				<DataType>stringCollection</DataType>
+				<UserInputType>Readonly</UserInputType>
+			</ClaimType>
+			<ClaimType Id="roles">
+				<DisplayName>roles</DisplayName>
+				<DataType>stringCollection</DataType>
+				<UserInputType>Readonly</UserInputType>
+			</ClaimType>
+		</ClaimsSchema>
 
+		<!-- ==== Переопределяем ContentDefinitions ==== -->
+		<ContentDefinitions>
 
-    <ClaimsProvider>
-      <DisplayName>Local Account SignIn</DisplayName>
-      <TechnicalProfiles>
-         <TechnicalProfile Id="login-NonInteractive">
-          <Metadata>
-            <Item Key="client_id">{Settings:ProxyIdentityExperienceFrameworkAppId}</Item>
-            <Item Key="IdTokenAudience">{Settings:IdentityExperienceFrameworkAppId}</Item>
-          </Metadata>
-          <InputClaims>
-            <InputClaim ClaimTypeReferenceId="signInName" PartnerClaimType="username" Required="true" />
-            <InputClaim ClaimTypeReferenceId="client_id" DefaultValue="{Settings:ProxyIdentityExperienceFrameworkAppId}" />
-            <InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="{Settings:IdentityExperienceFrameworkAppId}" />
-          </InputClaims>
-        </TechnicalProfile>
-      </TechnicalProfiles>
-    </ClaimsProvider>
-    <ClaimsProvider>
-      <DisplayName>REST APIs</DisplayName>
-      <TechnicalProfiles>
-        <TechnicalProfile Id="REST-GetPermissions">
-          <DisplayName>Retrieves users permissions from database</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <Metadata>
-            <!-- Set the ServiceUrl with your own REST API endpoint -->
-            <Item Key="ServiceUrl">{Settings:PermissionsAPIUrl}</Item>
-            <Item Key="SendClaimsIn">Body</Item>
-            <Item Key="AuthenticationType">ApiKeyHeader</Item>
-            <Item Key="AllowInsecureAuthInProduction">false</Item>
-          </Metadata>
-          <CryptographicKeys>
-            <Key Id="x-api-key" StorageReferenceId="{Settings:RESTAPIKey}" />
-          </CryptographicKeys>
-          <InputClaims>
-            <!-- Claims sent to your REST API -->
-            <InputClaim ClaimTypeReferenceId="objectId" />
-            <InputClaim ClaimTypeReferenceId="signInNames.emailAddress"/>
-             <InputClaim ClaimTypeReferenceId="client_id" PartnerClaimType="clientId"  DefaultValue="{OIDC:ClientId}" />
-          </InputClaims>
-          <OutputClaims>
-            <!-- Claims parsed from your REST API -->
-            <OutputClaim ClaimTypeReferenceId="permissions" />
-          </OutputClaims>
-          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
-        </TechnicalProfile>
-         <TechnicalProfile Id="REST-GetRoles">
-          <DisplayName>Retrieves users app roles</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <Metadata>
-            <!-- Set the ServiceUrl with your own REST API endpoint -->
-            <Item Key="ServiceUrl">{Settings:RolesAPIUrl}</Item>
-            <Item Key="SendClaimsIn">Body</Item>
-            <Item Key="AuthenticationType">ApiKeyHeader</Item>
-            <Item Key="AllowInsecureAuthInProduction">false</Item>
-          </Metadata>
-          <CryptographicKeys>
-            <Key Id="x-api-key" StorageReferenceId="{Settings:RESTAPIKey}" />
-          </CryptographicKeys>
-          <InputClaims>
-            <!-- Claims sent to your REST API -->
-            <InputClaim ClaimTypeReferenceId="objectId" />
-            <InputClaim ClaimTypeReferenceId="signInNames.emailAddress"/>
-            <InputClaim ClaimTypeReferenceId="client_id" PartnerClaimType="clientId"  DefaultValue="{OIDC:ClientId}" />
-          </InputClaims>
-          <OutputClaims>
-            <!-- Claims parsed from your REST API -->
-            <OutputClaim ClaimTypeReferenceId="roles" />
-          </OutputClaims>
-          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
-        </TechnicalProfile>
-      </TechnicalProfiles>
-    </ClaimsProvider>
-  </ClaimsProviders>
+			<!-- Переопределяем Unified (SignUp/SignIn) -->
+			<ContentDefinition Id="api.signuporsignin">
+				<LoadUri>https://ekzarov.github.io/azure-b2c/login.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:unifiedssp:2.1.5</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Custom Unified SignIn/SignUp</Item>
+				</Metadata>
+			</ContentDefinition>
 
- 
-   <UserJourneys>
+			<!-- Локальный логин -->
+			<ContentDefinition Id="api.localaccountsignin">
+				<LoadUri>https://ekzarov.github.io/azure-b2c/login.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Custom Local Account Sign In</Item>
+				</Metadata>
+			</ContentDefinition>
 
-    <UserJourney Id="SignUpOrSignIn">
-      <OrchestrationSteps>
+			<!-- Локальная регистрация -->
+			<ContentDefinition Id="api.localaccountsignup">
+				<LoadUri>https://ekzarov.github.io/azure-b2c/login.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Custom Local Account Sign Up</Item>
+				</Metadata>
+			</ContentDefinition>
 
-        <OrchestrationStep Order="1" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
-          <ClaimsProviderSelections>
-            <ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
-          </ClaimsProviderSelections>
-          <ClaimsExchanges>
-            <ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
+		</ContentDefinitions>
+	</BuildingBlocks>
 
-        <OrchestrationStep Order="2" Type="ClaimsExchange">
-          <Preconditions>
-            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-              <Value>objectId</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-          </Preconditions>
-          <ClaimsExchanges>
-            <ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
+	<!-- ==== ClaimsProviders (как в твоём оригинале) ==== -->
+	<ClaimsProviders>
+		<ClaimsProvider>
+			<DisplayName>Local Account SignIn</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="login-NonInteractive">
+					<Metadata>
+						<Item Key="client_id">8a96568c-1e07-4bd9-97a7-d65d139e7815</Item>
+						<Item Key="IdTokenAudience">c89e6df2-17ba-4713-af54-e148e5a036a0</Item>
+					</Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="signInName" PartnerClaimType="username" Required="true" />
+						<InputClaim ClaimTypeReferenceId="client_id" DefaultValue="8a96568c-1e07-4bd9-97a7-d65d139e7815" />
+						<InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="c89e6df2-17ba-4713-af54-e148e5a036a0" />
+					</InputClaims>
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
 
-        <!-- This step reads any user attributes that we may not have received when in the token. -->
-        <OrchestrationStep Order="3" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-        <OrchestrationStep Order="4" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="RESTGetPermissions" TechnicalProfileReferenceId="REST-GetPermissions" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-        <OrchestrationStep Order="5" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="RESTGetRoles" TechnicalProfileReferenceId="REST-GetRoles" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-        <OrchestrationStep Order="6" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+		<ClaimsProvider>
+			<DisplayName>REST APIs</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="REST-GetPermissions">
+					<DisplayName>Retrieves users permissions from database</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ServiceUrl">https://api-permission-asdk-test-wsft.azurewebsites.net/api/CustomClaims/permissions</Item>
+						<Item Key="SendClaimsIn">Body</Item>
+						<Item Key="AuthenticationType">ApiKeyHeader</Item>
+						<Item Key="AllowInsecureAuthInProduction">false</Item>
+					</Metadata>
+					<CryptographicKeys>
+						<Key Id="x-api-key" StorageReferenceId="B2C_1A_RestApiKey" />
+					</CryptographicKeys>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="objectId" />
+						<InputClaim ClaimTypeReferenceId="signInNames.emailAddress"/>
+						<InputClaim ClaimTypeReferenceId="client_id" PartnerClaimType="clientId"  DefaultValue="{OIDC:ClientId}" />
+					</InputClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="permissions" />
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
 
-      </OrchestrationSteps>
-      <ClientDefinition ReferenceId="DefaultWeb" />
-    </UserJourney>
+				<TechnicalProfile Id="REST-GetRoles">
+					<DisplayName>Retrieves users app roles</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ServiceUrl">https://api-permission-asdk-test-wsft.azurewebsites.net/api/CustomClaims/roles</Item>
+						<Item Key="SendClaimsIn">Body</Item>
+						<Item Key="AuthenticationType">ApiKeyHeader</Item>
+						<Item Key="AllowInsecureAuthInProduction">false</Item>
+					</Metadata>
+					<CryptographicKeys>
+						<Key Id="x-api-key" StorageReferenceId="B2C_1A_RestApiKey" />
+					</CryptographicKeys>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="objectId" />
+						<InputClaim ClaimTypeReferenceId="signInNames.emailAddress"/>
+						<InputClaim ClaimTypeReferenceId="client_id" PartnerClaimType="clientId"  DefaultValue="{OIDC:ClientId}" />
+					</InputClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="roles" />
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+	</ClaimsProviders>
 
-    <UserJourney Id="ProfileEdit">
-      <OrchestrationSteps>
+	<!-- ==== User Journeys (как в твоём оригинале) ==== -->
+	<UserJourneys>
 
-        <OrchestrationStep Order="1" Type="ClaimsProviderSelection" ContentDefinitionReferenceId="api.idpselections">
-          <ClaimsProviderSelections>
-            <ClaimsProviderSelection TargetClaimsExchangeId="LocalAccountSigninEmailExchange" />
-          </ClaimsProviderSelections>
-        </OrchestrationStep>
-        <OrchestrationStep Order="2" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-        <OrchestrationStep Order="3" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
+		<UserJourney Id="SignUpOrSignIn">
+			<OrchestrationSteps>
+				<OrchestrationStep Order="1" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
+					<ClaimsProviderSelections>
+						<ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
+					</ClaimsProviderSelections>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
 
-        <OrchestrationStep Order="4" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="B2CUserProfileUpdateExchange" TechnicalProfileReferenceId="SelfAsserted-ProfileUpdate" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-         <OrchestrationStep Order="5" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="RESTGetPermissions" TechnicalProfileReferenceId="REST-GetPermissions"  />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-         <OrchestrationStep Order="6" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="RESTGetRoles" TechnicalProfileReferenceId="REST-GetRoles" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-     
-        <OrchestrationStep Order="7" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+				<OrchestrationStep Order="2" Type="ClaimsExchange">
+					<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+							<Value>objectId</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
 
-      </OrchestrationSteps>
-      <ClientDefinition ReferenceId="DefaultWeb" />
-    </UserJourney>
+				<OrchestrationStep Order="3" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="4" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="RESTGetPermissions" TechnicalProfileReferenceId="REST-GetPermissions" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="5" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="RESTGetRoles" TechnicalProfileReferenceId="REST-GetRoles" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="6" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+			</OrchestrationSteps>
+			<ClientDefinition ReferenceId="DefaultWeb" />
+		</UserJourney>
 
-    <UserJourney Id="PasswordReset">
-      <OrchestrationSteps>
-        <OrchestrationStep Order="1" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="PasswordResetUsingEmailAddressExchange" TechnicalProfileReferenceId="LocalAccountDiscoveryUsingEmailAddress" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-        <OrchestrationStep Order="2" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="NewCredentials" TechnicalProfileReferenceId="LocalAccountWritePasswordUsingObjectId" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-        <OrchestrationStep Order="3" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="RESTGetPermissions" TechnicalProfileReferenceId="REST-GetPermissions"  />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-         <OrchestrationStep Order="4" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="RESTGetRoles" TechnicalProfileReferenceId="REST-GetRoles" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-        <OrchestrationStep Order="5" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
-      </OrchestrationSteps>
-      <ClientDefinition ReferenceId="DefaultWeb" />
-    </UserJourney>
+		<UserJourney Id="ProfileEdit">
+			<OrchestrationSteps>
+				<OrchestrationStep Order="1" Type="ClaimsProviderSelection" ContentDefinitionReferenceId="api.idpselections">
+					<ClaimsProviderSelections>
+						<ClaimsProviderSelection TargetClaimsExchangeId="LocalAccountSigninEmailExchange" />
+					</ClaimsProviderSelections>
+				</OrchestrationStep>
+				<OrchestrationStep Order="2" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="3" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="4" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="B2CUserProfileUpdateExchange" TechnicalProfileReferenceId="SelfAsserted-ProfileUpdate" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="5" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="RESTGetPermissions" TechnicalProfileReferenceId="REST-GetPermissions"  />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="6" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="RESTGetRoles" TechnicalProfileReferenceId="REST-GetRoles" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="7" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+			</OrchestrationSteps>
+			<ClientDefinition ReferenceId="DefaultWeb" />
+		</UserJourney>
 
-  </UserJourneys>
+		<UserJourney Id="PasswordReset">
+			<OrchestrationSteps>
+				<OrchestrationStep Order="1" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="PasswordResetUsingEmailAddressExchange" TechnicalProfileReferenceId="LocalAccountDiscoveryUsingEmailAddress" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="2" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="NewCredentials" TechnicalProfileReferenceId="LocalAccountWritePasswordUsingObjectId" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="3" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="RESTGetPermissions" TechnicalProfileReferenceId="REST-GetPermissions"  />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="4" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="RESTGetRoles" TechnicalProfileReferenceId="REST-GetRoles" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="5" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+			</OrchestrationSteps>
+			<ClientDefinition ReferenceId="DefaultWeb" />
+		</UserJourney>
+
+	</UserJourneys>
+
 </TrustFrameworkPolicy>
